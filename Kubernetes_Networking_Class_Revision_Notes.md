@@ -1,0 +1,18 @@
+# Kubernetes Networking – Class Revision Notes  
+**Date:** 10 December 2025
+
+This class focused on the internal working of Kubernetes networking and how communication happens between different components inside a Kubernetes cluster. The discussion revolved around four core communication scenarios that together form the foundation of Kubernetes networking.
+
+The first scenario covered communication between containers within the same Pod. In Kubernetes, a Pod is treated as a single network entity. All containers inside a Pod share the same network namespace, which means they use the same IP address and port space. Because of this shared namespace, containers inside a Pod can communicate with each other using `localhost`, similar to how multiple processes communicate on a single machine. This setup simplifies intra-Pod communication and avoids the need for external networking mechanisms.
+
+The second scenario discussed communication between Pods running on the same node. When multiple Pods are scheduled on the same node, Kubernetes enables communication through a virtual network created on that node. This networking is managed by a CNI (Container Network Interface) plugin, which is responsible for allocating network resources and ensuring connectivity. The network plugin effectively routes traffic between Pods on the same node, acting as an intelligent intermediary that understands how traffic should flow between different workloads.
+
+The third scenario involved communication between Pods running on different nodes. In this case, Kubernetes relies on network plugins and host-level networking rules such as IP tables to route packets across nodes. Each Pod receives a unique IP address that is reachable from any other Pod in the cluster, regardless of the node it is running on. Kube-proxy plays an important role here by maintaining and updating routing rules on each node, ensuring that traffic is forwarded to the correct destination Pod across the cluster.
+
+The fourth scenario focused on communication between Pods and Services. Services provide a stable network interface for accessing Pods. When a Service is created, Kubernetes assigns it a Cluster IP, which acts as a virtual IP address. Traffic sent to this Cluster IP is automatically load-balanced across all Pods that match the Service’s selector. This abstraction allows Pods to be replaced or rescheduled without affecting consumers of the Service.
+
+Service discovery in Kubernetes is handled through CoreDNS. CoreDNS maps Service names to their corresponding Cluster IPs, enabling Pods to access Services using human-readable names instead of hardcoded IP addresses. Service endpoints are dynamically maintained and stored as routing rules, ensuring that traffic is always directed to healthy and available Pods.
+
+Several operational commands were discussed during the class. Commands such as `kubectl get svc` and `kubectl describe svc` are used to list Services and inspect their configuration and runtime state. Namespaces and labels were highlighted as important mechanisms for organizing resources and ensuring correct Service-to-Pod associations within the cluster.
+
+In summary, Kubernetes networking provides a powerful abstraction that allows distributed applications to communicate reliably across large clusters. Services decouple Pods from direct network exposure, while components such as kube-proxy and CoreDNS enable load balancing, service discovery, and high availability. Understanding these networking internals is essential for designing, operating, and troubleshooting Kubernetes-based systems.
